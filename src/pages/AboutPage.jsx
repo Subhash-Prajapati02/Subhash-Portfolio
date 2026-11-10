@@ -209,21 +209,24 @@ export default function AboutPage() {
 
               <div className="resume-actions-row">
                 <a
-                  href="/subhash_kumar_prajapati_resume.pdf"
+                  href={`${import.meta.env.BASE_URL}resume.pdf`}
                   download="Subhash_Kumar_Prajapati_Resume.pdf"
                   className="btn-primary"
+                  aria-label="Download Resume"
                 >
                   <Download size={16} />
                   <span>Download Resume</span>
                 </a>
 
                 <a
-                  href="/subhash_kumar_prajapati_resume.pdf"
+                  href={`${import.meta.env.BASE_URL}resume.pdf`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="btn-secondary"
+                  aria-label="View Resume in new tab"
                 >
-                  <span>View PDF in Browser</span>
+                  <FileText size={15} />
+                  <span>View Resume</span>
                   <ExternalLink size={15} />
                 </a>
               </div>

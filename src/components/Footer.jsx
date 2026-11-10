@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { Github, Linkedin, Mail, Clock } from 'lucide-react'
+import { ArrowUpRight, Linkedin, Github, Instagram, Mail } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 const MOTIVATIONAL_QUOTES = [
@@ -24,8 +24,8 @@ function getFormattedIST() {
     return formatter.format(new Date()) + ' IST'
   } catch {
     const now = new Date()
-    const utc = now.getTime() + (now.getTimezoneOffset() * 60000)
-    const istDate = new Date(utc + (3600000 * 5.5))
+    const utc = now.getTime() + now.getTimezoneOffset() * 60000
+    const istDate = new Date(utc + 3600000 * 5.5)
     let hours = istDate.getHours()
     const minutes = String(istDate.getMinutes()).padStart(2, '0')
     const seconds = String(istDate.getSeconds()).padStart(2, '0')
@@ -38,9 +38,7 @@ function getFormattedIST() {
 }
 
 export default function Footer() {
-  const currentYear = new Date().getFullYear()
-
-  // 1. Live IST Clock (updates every second in format "hh:mm:ss AM/PM IST")
+  // 1. Live Indian Standard Time (IST) Clock (updates every second)
   const [istTime, setIstTime] = useState(() => getFormattedIST())
 
   useEffect(() => {
@@ -61,20 +59,19 @@ export default function Footer() {
   }, [])
 
   // 3. Genuine Website Visitor Count
-  // Persists count across visits via localStorage, and guards with sessionStorage so page reloads do not artificially inflate visits
   const [visitorCount, setVisitorCount] = useState(() => {
     try {
       const saved = localStorage.getItem('subhash_visitor_count')
-      return saved ? parseInt(saved, 10) : 184
+      return saved ? parseInt(saved, 10) : 185
     } catch {
-      return 184
+      return 185
     }
   })
 
   useEffect(() => {
     try {
       const hasVisitedThisSession = sessionStorage.getItem('subhash_session_active')
-      const currentVal = parseInt(localStorage.getItem('subhash_visitor_count') || '184', 10)
+      const currentVal = parseInt(localStorage.getItem('subhash_visitor_count') || '185', 10)
 
       if (!hasVisitedThisSession) {
         const nextVal = currentVal + 1
@@ -83,7 +80,6 @@ export default function Footer() {
         setVisitorCount(nextVal)
       }
 
-      // Sync with counter API if online in the browser
       fetch('https://api.counterapi.dev/v1/subhash-portfolio-prod/visitors/up')
         .then((res) => res.json())
         .then((data) => {
@@ -93,79 +89,66 @@ export default function Footer() {
             localStorage.setItem('subhash_visitor_count', synced.toString())
           }
         })
-        .catch(() => {
-          // Gracefully fallback to persistent localStorage counter
-        })
-    } catch {
-      // Gracefully handle browser storage restrictions
-    }
+        .catch(() => {})
+    } catch {}
   }, [])
 
+  const avatarFallback = `${import.meta.env.BASE_URL}avatar.svg`
+
   return (
-    <footer className="editorial-global-footer">
-      {/* High-Impact "Get in touch" Call to Action with Large Circular Button */}
-      <div className="container footer-cta-band">
-        <div className="footer-cta-content">
-          <h2 className="footer-cta-headline">
-            Let's build practical AI together.
+    <footer className="aadarsh-editorial-footer">
+      {/* 1. Header Row: Circular Profile Avatar + "Let's work together" + Diagonal Arrow */}
+      <div className="container footer-headline-row">
+        <div className="footer-identity-group">
+          <div className="footer-profile-avatar-wrap">
+            <img
+              src="https://github.com/Subhash-Prajapati02.png"
+              alt="Subhash Kumar Prajapati"
+              className="footer-profile-avatar-img"
+              onError={(e) => {
+                e.currentTarget.onerror = null
+                e.currentTarget.src = avatarFallback
+              }}
+            />
+          </div>
+
+          <h2 className="footer-headline-title">
+            <span className="footer-headline-line">Let's work</span>
+            <span className="footer-headline-line">together</span>
           </h2>
-          <p className="footer-cta-subtext">
-            Available for AI/ML engineering roles, freelance architectures, and research initiatives.
-          </p>
         </div>
 
-        <Link to="/contact" className="footer-circular-cta-btn" aria-label="Get in touch with Subhash">
+        <div className="footer-headline-arrow-wrap" aria-hidden="true">
+          <ArrowUpRight size={38} strokeWidth={1.75} className="footer-headline-arrow" />
+        </div>
+      </div>
+
+      {/* 2. Full-Width Divider Line with Overlapping Circular "Get in touch" Button */}
+      <div className="container footer-divider-track">
+        <div className="footer-horizontal-line" />
+
+        <Link
+          to="/contact"
+          className="footer-overlapping-get-in-touch-btn"
+          aria-label="Get in touch with Subhash"
+        >
           <span>Get in touch</span>
         </Link>
       </div>
 
-      <div className="footer-divider-rule" />
-
-      {/* Simplified Layout: Social & Motivational Quotes */}
-      <div className="container footer-simplified-center">
-        <div className="footer-brand-header">
-          <span className="footer-signature-name">Subhash Prajapati</span>
-          <p className="footer-role-label">AI Engineer & ML Engineer</p>
+      {/* 3. Three Balanced Footer Sections: Left (Version) | Center (Quotes + Socials) | Right (Time & Visitors) */}
+      <div className="container footer-bottom-meta-grid">
+        {/* LEFT SECTION — VERSION */}
+        <div className="footer-meta-block footer-block-version">
+          <span className="footer-meta-tag">VERSION</span>
+          <span className="footer-meta-content">2026 © Subhash Prajapati</span>
+          <span className="footer-meta-subtext">Crafted with love</span>
         </div>
 
-        {/* Social Icons Row (Centered, minimal icons only, no text labels) */}
-        <div className="footer-social-section">
-          <span className="footer-social-heading">Social</span>
-          <div className="footer-social-icons-row">
-            <a
-              href="https://github.com/Subhash-Prajapati02"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="footer-social-icon-btn"
-              aria-label="GitHub profile"
-              title="GitHub"
-            >
-              <Github size={19} />
-            </a>
-            <a
-              href="https://linkedin.com/in/subhash-kumar-prajapati-7945252b9/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="footer-social-icon-btn"
-              aria-label="LinkedIn profile"
-              title="LinkedIn"
-            >
-              <Linkedin size={19} />
-            </a>
-            <a
-              href="mailto:workwithsubhash22@gmail.com"
-              className="footer-social-icon-btn"
-              aria-label="Email Subhash"
-              title="Email"
-            >
-              <Mail size={19} />
-            </a>
-          </div>
-        </div>
-
-        {/* Motivational Quotes Section (Smooth auto-change every 5-7s) */}
-        <div className="footer-quote-section">
-          <div className="footer-quote-box">
+        {/* CENTER SECTION — QUOTES ABOVE SOCIALS & SOCIAL MEDIA ICONS */}
+        <div className="footer-meta-block footer-block-center">
+          {/* Rotating Motivational Quote */}
+          <div className="footer-center-quote-box">
             <AnimatePresence mode="wait">
               <motion.p
                 key={quoteIndex}
@@ -173,39 +156,70 @@ export default function Footer() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -5 }}
                 transition={{ duration: 0.45, ease: 'easeInOut' }}
-                className="footer-quote-text"
+                className="footer-center-quote-text"
               >
                 “{MOTIVATIONAL_QUOTES[quoteIndex]}”
               </motion.p>
             </AnimatePresence>
           </div>
+
+          {/* Socials Heading */}
+          <span className="footer-meta-tag footer-socials-heading-tag">SOCIALS</span>
+
+          {/* Centered Horizontal Row with Recognizable Social Icons */}
+          <div className="footer-social-icons-center-row">
+            <a
+              href="https://linkedin.com/in/subhash-kumar-prajapati-7945252b9/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="footer-social-icon-btn footer-social-linkedin"
+              aria-label="LinkedIn profile"
+              title="LinkedIn"
+            >
+              <Linkedin size={18} />
+            </a>
+
+            <a
+              href="https://github.com/Subhash-Prajapati02"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="footer-social-icon-btn footer-social-github"
+              aria-label="GitHub profile"
+              title="GitHub"
+            >
+              <Github size={18} />
+            </a>
+
+            <a
+              href="https://www.instagram.com/_subhaash.x/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="footer-social-icon-btn footer-social-instagram"
+              aria-label="Instagram profile"
+              title="Instagram"
+            >
+              <Instagram size={18} />
+            </a>
+
+            <a
+              href="mailto:workwithsubhash22@gmail.com"
+              className="footer-social-icon-btn footer-social-email"
+              aria-label="Email Subhash"
+              title="Email"
+            >
+              <Mail size={18} />
+            </a>
+          </div>
         </div>
-      </div>
 
-      <div className="footer-bottom-divider" />
-
-      {/* Bottom Area: Genuine Visitor Count (Left) & Live IST Clock (Right) */}
-      <div className="container footer-bottom-meta-bar">
-        <div className="footer-meta-left">
-          <span className="footer-pulse-dot" aria-hidden="true" />
-          <span className="footer-meta-label">Visitors</span>
-          <span className="footer-meta-value font-mono">
-            {visitorCount.toLocaleString()}
-          </span>
-        </div>
-
-        <div className="footer-meta-center">
-          <span className="footer-meta-copyright">
-            © {currentYear} Subhash Kumar Prajapati · Crafted with love
-          </span>
-        </div>
-
-        <div className="footer-meta-right">
-          <Clock size={14} className="footer-clock-icon" aria-hidden="true" />
-          <span className="footer-meta-label">IST</span>
-          <span className="footer-meta-value font-mono" title="Indian Standard Time (Bhopal, India)">
-            {istTime}
-          </span>
+        {/* RIGHT SECTION — LOCAL TIME & VISITORS */}
+        <div className="footer-meta-block footer-block-time">
+          <span className="footer-meta-tag">LOCAL TIME</span>
+          <span className="footer-meta-content font-mono">{istTime}</span>
+          <div className="footer-visitor-indicator">
+            <span className="footer-online-dot" aria-hidden="true" />
+            <span className="footer-visitor-text">{visitorCount.toLocaleString()} visitors</span>
+          </div>
         </div>
       </div>
     </footer>

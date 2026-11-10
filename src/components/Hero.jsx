@@ -1,4 +1,4 @@
-import { Github, Linkedin, Mail, ArrowUpRight, ArrowDown, FileText } from 'lucide-react'
+import { Github, Linkedin, Mail, ArrowUpRight, ArrowDown, FileText, Download } from 'lucide-react'
 import { motion } from 'framer-motion'
 
 export default function Hero() {
@@ -68,15 +68,25 @@ export default function Hero() {
           </button>
 
           <a
-            href="/subhash_kumar_prajapati_resume.pdf"
-            download="Subhash_Kumar_Prajapati_Resume.pdf"
+            href={`${import.meta.env.BASE_URL}resume.pdf`}
             target="_blank"
             rel="noopener noreferrer"
             className="btn-secondary"
+            aria-label="View Resume in new tab"
           >
             <FileText size={16} />
-            <span>Download Resume</span>
+            <span>View Resume</span>
             <ArrowUpRight size={14} className="btn-external-icon" />
+          </a>
+
+          <a
+            href={`${import.meta.env.BASE_URL}resume.pdf`}
+            download="Subhash_Kumar_Prajapati_Resume.pdf"
+            className="btn-secondary"
+            aria-label="Download Resume"
+          >
+            <Download size={16} />
+            <span>Download Resume</span>
           </a>
         </motion.div>
 

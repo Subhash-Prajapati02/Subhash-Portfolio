@@ -6,17 +6,9 @@ export default function SplashScreen({ words, duration = 2200, onComplete }) {
   const [currentWordIndex, setCurrentWordIndex] = useState(0)
   const [isExiting, setIsExiting] = useState(false)
 
-  // Respect prefers-reduced-motion
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
-    if (mediaQuery.matches) {
-      if (onComplete) onComplete()
-    }
-  }, [onComplete])
-
   // Word rotation and exit sequence
   useEffect(() => {
-    // If single word (Work or Project): display briefly, then start slide-up exit
+    // If single word (Work, About, Contact, Project): display briefly, then start slide-up exit
     if (wordList.length === 1) {
       const exitTimer = setTimeout(() => {
         setIsExiting(true)
