@@ -1,11 +1,27 @@
 import { useState } from 'react'
-import { Mail, Github, Linkedin, MapPin, Send, Copy, Check, ArrowUpRight, MessageSquare, Clock } from 'lucide-react'
+import {
+  Mail,
+  Phone,
+  Linkedin,
+  Github,
+  Instagram,
+  Copy,
+  Check,
+  ArrowUpRight,
+  MapPin,
+  Clock,
+  Compass,
+  Sparkles,
+  ExternalLink
+} from 'lucide-react'
+import IndiaMap from '@svg-maps/india'
+
+// Pinpoint coordinate mapping for Bhopal (23.2599° N, 77.4126° E) in 612x696 canvas
+const BHOPAL_COORDS = { x: 246.4, y: 290.0 }
 
 export default function ContactPage() {
-  const [formData, setFormData] = useState({ name: '', email: '', subject: '', message: '' })
-  const [errors, setErrors] = useState({})
   const [copied, setCopied] = useState(false)
-  const [formNotice, setFormNotice] = useState(null)
+  const [hoveredState, setHoveredState] = useState(null)
 
   const copyEmail = () => {
     navigator.clipboard.writeText('workwithsubhash22@gmail.com')
@@ -13,53 +29,12 @@ export default function ContactPage() {
     setTimeout(() => setCopied(false), 2400)
   }
 
-  const validate = () => {
-    const errs = {}
-    if (!formData.name.trim()) errs.name = 'Please provide your full name.'
-    if (!formData.email.trim()) {
-      errs.email = 'Please provide your email address.'
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      errs.email = 'Please enter a valid email address.'
-    }
-    if (!formData.message.trim()) {
-      errs.message = 'Please enter your message.'
-    } else if (formData.message.trim().length < 10) {
-      errs.message = 'Message must be at least 10 characters long.'
-    }
-    return errs
-  }
-
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    const foundErrors = validate()
-    if (Object.keys(foundErrors).length > 0) {
-      setErrors(foundErrors)
-      setFormNotice(null)
-      return
-    }
-
-    setErrors({})
-    const mailtoSubject = encodeURIComponent(formData.subject ? `[Portfolio] ${formData.subject}` : `[Portfolio Inquiry] from ${formData.name}`)
-    const mailtoBody = encodeURIComponent(`Sender Name: ${formData.name}\nEmail: ${formData.email}\n\nMessage:\n${formData.message}`)
-    window.location.href = `mailto:workwithsubhash22@gmail.com?subject=${mailtoSubject}&body=${mailtoBody}`
-
-    setFormNotice('Your email client is opening with your formatted message. You can also write directly to workwithsubhash22@gmail.com.')
-  }
-
-  const handleChange = (e) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
-    if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: '' }))
-    }
-  }
-
   return (
     <div className="contact-page-wrapper">
       <div className="container">
-        {/* Large Typography Headline */}
+        {/* Page Editorial Header */}
         <section className="contact-page-hero">
-          <span className="editorial-eyebrow">Get In Touch</span>
+          <span className="editorial-eyebrow">04 / CONTACT</span>
           <h1 className="contact-page-headline">
             Let's build something meaningful together.
           </h1>
@@ -69,159 +44,299 @@ export default function ContactPage() {
           </p>
         </section>
 
-        <div className="editorial-divider-line" style={{ margin: '36px 0 64px' }} />
+        <div className="editorial-divider-line" style={{ margin: '36px 0 48px' }} />
 
-        {/* Two-Column Contact Layout */}
-        <div className="contact-page-grid">
-          {/* Left Column: Direct Channels & Availability Notice */}
-          <div className="contact-page-left">
-            {/* Availability Notice Card */}
-            <div className="contact-availability-box">
-              <div className="availability-indicator-row">
-                <span className="status-indicator-dot" aria-hidden="true" />
-                <span className="availability-status-label">CURRENT STATUS</span>
+        {/* Top Layout Grid: Left (Status & Primary Contact) vs Right (Current Location & India Map) */}
+        <div className="contact-main-grid">
+          {/* Left Column: Current Status & Primary Contact Cards */}
+          <div className="contact-info-col">
+            {/* 1. Current Status Card */}
+            <div className="contact-card contact-status-card">
+              <div className="status-header-row">
+                <span className="status-live-beacon" aria-hidden="true">
+                  <span className="beacon-ping" />
+                  <span className="beacon-dot-indicator" />
+                </span>
+                <span className="status-badge-text">CURRENT STATUS</span>
               </div>
-              <h3 className="availability-status-title">Actively Seeking Opportunities</h3>
-              <p className="availability-status-text">
+              <h2 className="status-title-text">Actively Seeking Opportunities</h2>
+              <p className="status-desc-text">
                 Available for on-site roles in Bhopal, hybrid positions, and remote international engineering teams.
                 Typically responding to professional inquiries within 24 hours.
               </p>
             </div>
 
-            {/* Direct Email Card with One-Click Copy */}
-            <div className="contact-direct-card">
-              <span className="contact-channel-micro">PRIMARY CONTACT</span>
-              <a href="mailto:workwithsubhash22@gmail.com" className="contact-email-link">
-                workwithsubhash22@gmail.com
-              </a>
-              <button
-                type="button"
-                onClick={copyEmail}
-                className="btn-secondary btn-compact"
-                style={{ marginTop: '14px', alignSelf: 'flex-start' }}
-              >
-                {copied ? <Check size={14} className="text-accent" /> : <Copy size={14} />}
-                <span>{copied ? 'Copied to Clipboard' : 'Copy Email Address'}</span>
-              </button>
+            {/* 2. Primary Contact Section Heading */}
+            <div className="contact-section-label-row">
+              <span className="contact-micro-label">PRIMARY CONTACT</span>
             </div>
 
-            {/* Social Network Links */}
-            <div className="contact-social-channels-stack">
-              <a
-                href="https://linkedin.com/in/subhash-kumar-prajapati-7945252b9/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="contact-social-channel-item"
-              >
-                <div className="channel-icon-pill"><Linkedin size={18} /></div>
-                <div className="channel-text-col">
-                  <span className="channel-title">LinkedIn</span>
-                  <span className="channel-url-handle">in/subhash-kumar-prajapati-7945252b9</span>
+            {/* 3. Email Contact Card */}
+            <div className="contact-card contact-channel-card">
+              <div className="channel-card-top">
+                <div className="channel-icon-avatar">
+                  <Mail size={20} />
                 </div>
-                <ArrowUpRight size={16} className="channel-arrow-out" />
-              </a>
+                <div className="channel-meta-col">
+                  <span className="channel-type-label">EMAIL ADDRESS</span>
+                  <a
+                    href="mailto:workwithsubhash22@gmail.com"
+                    className="channel-value-link"
+                    title="Send an email to workwithsubhash22@gmail.com"
+                  >
+                    workwithsubhash22@gmail.com
+                  </a>
+                </div>
+              </div>
+              <div className="channel-card-actions">
+                <button
+                  type="button"
+                  onClick={copyEmail}
+                  className={`contact-copy-btn ${copied ? 'is-copied' : ''}`}
+                  aria-label="Copy email address to clipboard"
+                >
+                  {copied ? <Check size={14} className="copy-icon-success" /> : <Copy size={14} />}
+                  <span>{copied ? 'Copied to Clipboard' : 'Copy Email Address'}</span>
+                </button>
+              </div>
+            </div>
 
-              <a
-                href="https://github.com/Subhash-Prajapati02"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="contact-social-channel-item"
-              >
-                <div className="channel-icon-pill"><Github size={18} /></div>
-                <div className="channel-text-col">
-                  <span className="channel-title">GitHub</span>
-                  <span className="channel-url-handle">github.com/Subhash-Prajapati02</span>
+            {/* 4. Phone Contact Card */}
+            <div className="contact-card contact-channel-card">
+              <div className="channel-card-top">
+                <div className="channel-icon-avatar">
+                  <Phone size={20} />
                 </div>
-                <ArrowUpRight size={16} className="channel-arrow-out" />
-              </a>
-
-              <div className="contact-social-channel-item is-static">
-                <div className="channel-icon-pill"><MapPin size={18} /></div>
-                <div className="channel-text-col">
-                  <span className="channel-title">Location</span>
-                  <span className="channel-url-handle">Bhopal, Madhya Pradesh, India</span>
+                <div className="channel-meta-col">
+                  <span className="channel-type-label">PHONE NUMBER</span>
+                  <a
+                    href="tel:+917000239226"
+                    className="channel-value-link"
+                    title="Call +91 70002 39226"
+                  >
+                    +91 70002 39226
+                  </a>
                 </div>
+              </div>
+              <div className="channel-card-footer">
+                <span className="channel-sub-info">Direct line & WhatsApp · Tap to connect</span>
+                <a
+                  href="tel:+917000239226"
+                  className="channel-call-cta"
+                  aria-label="Call +91 70002 39226 directly"
+                >
+                  <span>Call Direct</span>
+                  <ArrowUpRight size={14} />
+                </a>
               </div>
             </div>
           </div>
 
-          {/* Right Column: Contact Message Form */}
-          <div className="contact-page-right">
-            <form className="contact-form-editorial" onSubmit={handleSubmit} noValidate>
-              <h2 className="form-editorial-title">Send a Direct Message</h2>
-
-              {formNotice && (
-                <div className="form-notification-banner" role="status">
-                  <p>{formNotice}</p>
-                </div>
-              )}
-
-              <div className="form-row-2col">
-                <div className="form-input-group">
-                  <label htmlFor="contact-page-name" className="field-label">Name *</label>
-                  <input
-                    id="contact-page-name"
-                    type="text"
-                    name="name"
-                    className={`field-input ${errors.name ? 'field-error' : ''}`}
-                    placeholder="e.g. Sarah Jenkins"
-                    value={formData.name}
-                    onChange={handleChange}
-                    autoComplete="name"
-                  />
-                  {errors.name && <span className="field-error-message">{errors.name}</span>}
+          {/* Right Column: Current Location & Interactive India Map */}
+          <div className="contact-location-col">
+            <div className="contact-card contact-location-card">
+              {/* Location Card Header */}
+              <div className="location-card-header">
+                <div className="location-title-wrap">
+                  <div className="location-icon-avatar">
+                    <MapPin size={20} />
+                  </div>
+                  <div>
+                    <span className="location-eyebrow">CURRENT LOCATION</span>
+                    <h2 className="location-city-heading">Bhopal, Madhya Pradesh, India</h2>
+                  </div>
                 </div>
 
-                <div className="form-input-group">
-                  <label htmlFor="contact-page-email" className="field-label">Email Address *</label>
-                  <input
-                    id="contact-page-email"
-                    type="email"
-                    name="email"
-                    className={`field-input ${errors.email ? 'field-error' : ''}`}
-                    placeholder="e.g. sarah@organization.com"
-                    value={formData.email}
-                    onChange={handleChange}
-                    autoComplete="email"
-                  />
-                  {errors.email && <span className="field-error-message">{errors.email}</span>}
+                <div className="location-tags-wrap">
+                  <span className="location-pill-tag">
+                    <Compass size={12} />
+                    <span>23.2599° N, 77.4126° E</span>
+                  </span>
+                  <span className="location-pill-tag">
+                    <Clock size={12} />
+                    <span>IST (UTC +5:30)</span>
+                  </span>
                 </div>
               </div>
 
-              <div className="form-input-group">
-                <label htmlFor="contact-page-subject" className="field-label">Subject</label>
-                <input
-                  id="contact-page-subject"
-                  type="text"
-                  name="subject"
-                  className="field-input"
-                  placeholder="e.g. AI/ML Engineering Position / Project Collaboration"
-                  value={formData.subject}
-                  onChange={handleChange}
-                />
-              </div>
+              {/* Vector India Map Visualizer Container */}
+              <div className="india-map-visualizer">
+                {/* Ambient glow backdrop for dark mode */}
+                <div className="map-ambient-glow" aria-hidden="true" />
 
-              <div className="form-input-group">
-                <label htmlFor="contact-page-message" className="field-label">Message *</label>
-                <textarea
-                  id="contact-page-message"
-                  name="message"
-                  rows="6"
-                  className={`field-textarea ${errors.message ? 'field-error' : ''}`}
-                  placeholder="Tell me about your team, project requirements, or discussion topic..."
-                  value={formData.message}
-                  onChange={handleChange}
-                />
-                {errors.message && <span className="field-error-message">{errors.message}</span>}
-              </div>
+                {/* Hover state badge */}
+                <div className="map-hover-badge">
+                  <span className="badge-bullet">📍</span>
+                  <span className="badge-state-name">
+                    {hoveredState ? `${hoveredState}` : 'Madhya Pradesh · Bhopal HQ'}
+                  </span>
+                </div>
 
-              <button type="submit" className="btn-primary btn-full-width" style={{ marginTop: '12px' }}>
-                <span>Send via Mail Client</span>
-                <Send size={15} />
-              </button>
-            </form>
+                <svg
+                  viewBox={IndiaMap.viewBox || '0 0 612 696'}
+                  className="india-vector-svg"
+                  preserveAspectRatio="xMidYMid meet"
+                  role="img"
+                  aria-label="Map of India showing Bhopal in Madhya Pradesh"
+                >
+                  <defs>
+                    <radialGradient id="bhopalPulseGlow" cx="50%" cy="50%" r="50%">
+                      <stop offset="0%" stopColor="#818cf8" stopOpacity="0.7" />
+                      <stop offset="60%" stopColor="#6366f1" stopOpacity="0.25" />
+                      <stop offset="100%" stopColor="#4f46e5" stopOpacity="0" />
+                    </radialGradient>
+                    <filter id="mpGlowFilter" x="-20%" y="-20%" width="140%" height="140%">
+                      <feDropShadow dx="0" dy="0" stdDeviation="4" floodColor="#818cf8" floodOpacity="0.6" />
+                    </filter>
+                  </defs>
+
+                  {/* All Indian States */}
+                  <g className="india-states-layer">
+                    {IndiaMap.locations.map((loc) => {
+                      const isMP = loc.id === 'mp'
+                      return (
+                        <path
+                          key={loc.id}
+                          id={`state-${loc.id}`}
+                          d={loc.path}
+                          className={`state-vector-path ${isMP ? 'is-madhya-pradesh' : 'is-base-state'}`}
+                          onMouseEnter={() => setHoveredState(loc.name)}
+                          onMouseLeave={() => setHoveredState(null)}
+                        >
+                          <title>{loc.name}</title>
+                        </path>
+                      )
+                    })}
+                  </g>
+
+                  {/* Bhopal Pulsating Marker & Beacon */}
+                  <g
+                    className="bhopal-beacon-group"
+                    transform={`translate(${BHOPAL_COORDS.x}, ${BHOPAL_COORDS.y})`}
+                  >
+                    {/* Radiating Beacon Pulses */}
+                    <circle r="22" className="beacon-radar beacon-radar-outer" />
+                    <circle r="13" className="beacon-radar beacon-radar-inner" />
+                    <circle r="26" fill="url(#bhopalPulseGlow)" className="beacon-glow-disc" />
+
+                    {/* Center Beacon Dot */}
+                    <circle r="5.5" className="beacon-center-ring" />
+                    <circle r="2.2" className="beacon-center-dot" />
+
+                    {/* Floating Bhopal Label Badge */}
+                    <g className="bhopal-pin-tag" transform="translate(12, -10)">
+                      <rect
+                        x="0"
+                        y="-13"
+                        width="92"
+                        height="22"
+                        rx="6"
+                        className="pin-tag-surface"
+                      />
+                      <circle cx="10" cy="-2" r="3" className="pin-tag-dot" />
+                      <text x="18" y="2" className="pin-tag-label">
+                        Bhopal, India
+                      </text>
+                    </g>
+                  </g>
+                </svg>
+
+                {/* Map Bottom Metadata Footer */}
+                <div className="map-caption-footer">
+                  <span className="caption-text">
+                    Accurate geographic boundaries of India · Madhya Pradesh state highlight
+                  </span>
+                  <span className="caption-badge">Central Engineering Base</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
+
+        <div className="editorial-divider-line" style={{ margin: '56px 0 36px' }} />
+
+        {/* Bottom Section: Dedicated Social Profiles Grid */}
+        <section className="contact-socials-section">
+          <div className="socials-section-header">
+            <span className="socials-micro-label">SOCIAL PROFILES</span>
+            <h2 className="socials-section-title">Connect & Explore My Work</h2>
+            <p className="socials-section-desc">
+              Follow my research implementations, explore production code repositories,
+              and connect across professional networks.
+            </p>
+          </div>
+
+          <div className="contact-social-grid">
+            {/* LinkedIn Card */}
+            <a
+              href="https://www.linkedin.com/in/subhash-kumar-prajapati-7945252b9/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="social-profile-card"
+              title="Open Subhash's LinkedIn profile in a new tab"
+            >
+              <div className="profile-card-top">
+                <div className="profile-icon-pill linkedin-icon-pill">
+                  <Linkedin size={22} />
+                </div>
+                <ArrowUpRight size={18} className="profile-external-arrow" />
+              </div>
+              <div className="profile-card-content">
+                <h3 className="profile-platform-name">LinkedIn</h3>
+                <span className="profile-handle-text">in/subhash-kumar-prajapati-7945252b9</span>
+                <p className="profile-card-bio">
+                  Professional updates, research achievements, engineering network & endorsements.
+                </p>
+              </div>
+            </a>
+
+            {/* GitHub Card */}
+            <a
+              href="https://github.com/Subhash-Prajapati02"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="social-profile-card"
+              title="Open Subhash's GitHub profile in a new tab"
+            >
+              <div className="profile-card-top">
+                <div className="profile-icon-pill github-icon-pill">
+                  <Github size={22} />
+                </div>
+                <ArrowUpRight size={18} className="profile-external-arrow" />
+              </div>
+              <div className="profile-card-content">
+                <h3 className="profile-platform-name">GitHub</h3>
+                <span className="profile-handle-text">Subhash-Prajapati02</span>
+                <p className="profile-card-bio">
+                  Open-source AI/ML architectures, fine-tuning scripts, and end-to-end data pipelines.
+                </p>
+              </div>
+            </a>
+
+            {/* Instagram Card */}
+            <a
+              href="https://www.instagram.com/_subhaash.x/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="social-profile-card"
+              title="Open Subhash's Instagram profile in a new tab"
+            >
+              <div className="profile-card-top">
+                <div className="profile-icon-pill instagram-icon-pill">
+                  <Instagram size={22} />
+                </div>
+                <ArrowUpRight size={18} className="profile-external-arrow" />
+              </div>
+              <div className="profile-card-content">
+                <h3 className="profile-platform-name">Instagram</h3>
+                <span className="profile-handle-text">_subhaash.x</span>
+                <p className="profile-card-bio">
+                  Visual designs, creative coding experiments, tech thoughts & personal moments.
+                </p>
+              </div>
+            </a>
+          </div>
+        </section>
       </div>
     </div>
   )

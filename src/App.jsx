@@ -31,6 +31,8 @@ function MainLayout({ theme, toggleTheme }) {
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/work" element={<WorkPage />} />
+          <Route path="/work/:id" element={<WorkPage />} />
+          <Route path="/projects/:id" element={<WorkPage />} />
           <Route path="/contact" element={<ContactPage />} />
           {/* Catch-all fallback route */}
           <Route path="*" element={<Home />} />
@@ -62,7 +64,7 @@ export default function App() {
   }
 
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
       <SplashProvider>
         <MainLayout theme={theme} toggleTheme={toggleTheme} />
       </SplashProvider>

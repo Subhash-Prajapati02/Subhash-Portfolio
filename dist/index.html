@@ -14,8 +14,28 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-    <script type="module" crossorigin src="/Subhash-Portfolio/assets/index-BjdDi7F2.js"></script>
-    <link rel="stylesheet" crossorigin href="/Subhash-Portfolio/assets/index-MQIQACL3.css">
+    <!-- Single Page App URL restoration for GitHub Pages -->
+    <script>
+      (function() {
+        var search = window.location.search;
+        if (search.startsWith('?/')) {
+          var decoded = search.slice(1).split('&')[0].replace(/~and~/g, '&');
+          window.history.replaceState(null, null,
+            window.location.pathname.replace(/\/$/, '') + decoded + window.location.hash
+          );
+        } else if (search.includes('p=')) {
+          var match = search.match(/[?&]p=([^&]+)/);
+          if (match && match[1]) {
+            var decodedPath = decodeURIComponent(match[1]);
+            window.history.replaceState(null, null,
+              window.location.pathname.replace(/\/$/, '') + decodedPath + window.location.hash
+            );
+          }
+        }
+      })();
+    </script>
+    <script type="module" crossorigin src="/Subhash-Portfolio/assets/index-CU7SrKn3.js"></script>
+    <link rel="stylesheet" crossorigin href="/Subhash-Portfolio/assets/index-BqcNcPnw.css">
   </head>
   <body>
     <div id="root"></div>

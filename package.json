@@ -6,9 +6,11 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "postbuild": "node -e \"const fs=require('fs'); if(fs.existsSync('dist/index.html') && !fs.existsSync('dist/404.html')) { fs.copyFileSync('dist/index.html', 'dist/404.html'); console.log('postbuild: created dist/404.html'); }\"",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@svg-maps/india": "^2.0.0",
     "framer-motion": "^11.11.0",
     "lucide-react": "^0.460.0",
     "react": "^18.3.1",
