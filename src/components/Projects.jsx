@@ -141,13 +141,14 @@ export default function Projects() {
   const mouseX = useMotionValue(0)
   const mouseY = useMotionValue(0)
 
-  const springConfig = { damping: 28, stiffness: 280, mass: 0.25 }
+  const springConfig = { damping: 28, stiffness: 300, mass: 0.2 }
   const springX = useSpring(mouseX, springConfig)
   const springY = useSpring(mouseY, springConfig)
 
   // Track cursor position smoothly across window with edge clamping
   useEffect(() => {
     const handleGlobalMouseMove = (e) => {
+      if (e.pointerType === 'touch') return
       const { x, y } = clampToViewport(e.clientX, e.clientY)
       mouseX.set(x)
       mouseY.set(y)
@@ -158,7 +159,8 @@ export default function Projects() {
   }, [mouseX, mouseY])
 
   // Center immediately around pointer when hovering without jumping from (0,0)
-  const handleRowMouseEnter = (e, index) => {
+  const handleRowPointerEnter = (e, index) => {
+    if (e.pointerType === 'touch') return
     const { x, y } = clampToViewport(e.clientX, e.clientY)
     if (hoveredIndex === null) {
       mouseX.jump(x)
@@ -172,10 +174,18 @@ export default function Projects() {
     setHoveredIndex(index)
   }
 
-  const handleRowMouseMove = (e) => {
+  const handleRowPointerMove = (e, index) => {
+    if (e.pointerType === 'touch') return
     const { x, y } = clampToViewport(e.clientX, e.clientY)
     mouseX.set(x)
     mouseY.set(y)
+    if (hoveredIndex !== index) {
+      setHoveredIndex(index)
+    }
+  }
+
+  const handleListPointerLeave = () => {
+    setHoveredIndex(null)
   }
 
   // Body scroll locking when project modal is opened
@@ -211,7 +221,7 @@ export default function Projects() {
         {/* Project List Rows */}
         <div
           className="editorial-projects-list"
-          onMouseLeave={() => setHoveredIndex(null)}
+          onPointerLeave={handleListPointerLeave}
         >
           {projectsData.map((project, index) => {
             const isHovered = hoveredIndex === index
@@ -221,8 +231,8 @@ export default function Projects() {
               <div key={project.id} className="editorial-project-row-wrapper">
                 <div
                   className={`editorial-project-row ${isHovered ? 'is-active-hover' : ''} ${isDimmed ? 'is-dimmed' : ''}`}
-                  onMouseEnter={(e) => handleRowMouseEnter(e, index)}
-                  onMouseMove={handleRowMouseMove}
+                  onPointerEnter={(e) => handleRowPointerEnter(e, index)}
+                  onPointerMove={(e) => handleRowPointerMove(e, index)}
                   onClick={() => handleOpenProject(project)}
                   role="button"
                   tabIndex={0}
@@ -265,15 +275,15 @@ export default function Projects() {
           pointerEvents: 'none',
           zIndex: 900
         }}
+        aria-hidden="true"
       >
         <AnimatePresence>
           {activeProject && (
             <motion.div
-              key={activeProject.id}
               initial={{ opacity: 0, scale: 0.86, x: '-50%', y: '-50%' }}
               animate={{ opacity: 1, scale: 1, x: '-50%', y: '-50%' }}
               exit={{ opacity: 0, scale: 0.86, x: '-50%', y: '-50%' }}
-              transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
               className="floating-preview-card"
               style={{ background: activeProject.gradient }}
             >
@@ -287,19 +297,10 @@ export default function Projects() {
                 <PreviewArtwork type={activeProject.artworkType} />
               </div>
 
-              {/* Card Centerpiece: Interactive Circular "View" Button */}
-              <button
-                type="button"
-                className="card-center-view-btn"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  handleOpenProject(activeProject)
-                }}
-                aria-label={`View ${activeProject.title}`}
-                style={{ pointerEvents: 'auto' }}
-              >
+              {/* Card Centerpiece: Interactive Circular "View" Indicator */}
+              <div className="card-center-view-btn" aria-hidden="true">
                 <span>View</span>
-              </button>
+              </div>
 
               {/* Card Bottom: Project Title */}
               <div className="card-bottom-title">

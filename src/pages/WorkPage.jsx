@@ -1,8 +1,30 @@
 import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, useMotionValue, useSpring } from 'framer-motion'
 import { projectsData } from '../data/projectsData'
 import PreviewArtwork from '../components/PreviewArtwork'
 import { useSplash } from '../context/SplashContext'
+
+const CARD_WIDTH = 340
+const CARD_HEIGHT = 350
+const HALF_WIDTH = CARD_WIDTH / 2
+const HALF_HEIGHT = CARD_HEIGHT / 2
+const VIEWPORT_MARGIN = 24
+
+function clampToViewport(clientX, clientY) {
+  if (typeof window === 'undefined') return { x: clientX, y: clientY }
+  const vw = window.innerWidth
+  const vh = window.innerHeight
+
+  const minX = HALF_WIDTH + VIEWPORT_MARGIN
+  const maxX = Math.max(minX, vw - HALF_WIDTH - VIEWPORT_MARGIN)
+  const minY = HALF_HEIGHT + VIEWPORT_MARGIN
+  const maxY = Math.max(minY, vh - HALF_HEIGHT - VIEWPORT_MARGIN)
+
+  return {
+    x: Math.min(Math.max(clientX, minX), maxX),
+    y: Math.min(Math.max(clientY, minY), maxY)
+  }
+}
 import {
   LayoutGrid,
   List,
@@ -23,6 +45,55 @@ export default function WorkPage() {
   const handleOpenProject = (project) => {
     triggerProjectSplash()
     setSelectedProject(project)
+  }
+
+  // Smooth cursor tracking with physics springs for list view
+  const mouseX = useMotionValue(0)
+  const mouseY = useMotionValue(0)
+
+  const springConfig = { damping: 28, stiffness: 300, mass: 0.2 }
+  const springX = useSpring(mouseX, springConfig)
+  const springY = useSpring(mouseY, springConfig)
+
+  useEffect(() => {
+    const handleGlobalMouseMove = (e) => {
+      if (e.pointerType === 'touch') return
+      const { x, y } = clampToViewport(e.clientX, e.clientY)
+      mouseX.set(x)
+      mouseY.set(y)
+    }
+
+    window.addEventListener('mousemove', handleGlobalMouseMove, { passive: true })
+    return () => window.removeEventListener('mousemove', handleGlobalMouseMove)
+  }, [mouseX, mouseY])
+
+  const handleRowPointerEnter = (e, index) => {
+    if (e.pointerType === 'touch') return
+    const { x, y } = clampToViewport(e.clientX, e.clientY)
+    if (hoveredListIndex === null) {
+      mouseX.jump(x)
+      mouseY.jump(y)
+      if (typeof springX.jump === 'function') springX.jump(x)
+      if (typeof springY.jump === 'function') springY.jump(y)
+    } else {
+      mouseX.set(x)
+      mouseY.set(y)
+    }
+    setHoveredListIndex(index)
+  }
+
+  const handleRowPointerMove = (e, index) => {
+    if (e.pointerType === 'touch') return
+    const { x, y } = clampToViewport(e.clientX, e.clientY)
+    mouseX.set(x)
+    mouseY.set(y)
+    if (hoveredListIndex !== index) {
+      setHoveredListIndex(index)
+    }
+  }
+
+  const handleListPointerLeave = () => {
+    setHoveredListIndex(null)
   }
 
   const filterOptions = [
@@ -179,7 +250,7 @@ export default function WorkPage() {
           /* LIST VIEW: Editorial Large Rows */
           <div
             className="editorial-projects-list"
-            onMouseLeave={() => setHoveredListIndex(null)}
+            onPointerLeave={handleListPointerLeave}
           >
             {filteredProjects.map((project, idx) => {
               const isHovered = hoveredListIndex === idx
@@ -189,7 +260,8 @@ export default function WorkPage() {
                 <div key={project.id} className="editorial-project-row-wrapper">
                   <div
                     className={`editorial-project-row ${isHovered ? 'is-active-hover' : ''} ${isDimmed ? 'is-dimmed' : ''}`}
-                    onMouseEnter={() => setHoveredListIndex(idx)}
+                    onPointerEnter={(e) => handleRowPointerEnter(e, idx)}
+                    onPointerMove={(e) => handleRowPointerMove(e, idx)}
                     onClick={() => handleOpenProject(project)}
                     role="button"
                     tabIndex={0}
@@ -207,6 +279,49 @@ export default function WorkPage() {
           </div>
         )}
       </div>
+
+      {/* Floating Interactive Preview Card for List View */}
+      {viewMode === 'list' && (
+        <motion.div
+          className="floating-preview-card-portal"
+          style={{
+            x: springX,
+            y: springY,
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            pointerEvents: 'none',
+            zIndex: 900
+          }}
+          aria-hidden="true"
+        >
+          <AnimatePresence>
+            {hoveredListIndex !== null && filteredProjects[hoveredListIndex] && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.86, x: '-50%', y: '-50%' }}
+                animate={{ opacity: 1, scale: 1, x: '-50%', y: '-50%' }}
+                exit={{ opacity: 0, scale: 0.86, x: '-50%', y: '-50%' }}
+                transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                className="floating-preview-card"
+                style={{ background: filteredProjects[hoveredListIndex].gradient }}
+              >
+                <div className="card-top-tag">
+                  {filteredProjects[hoveredListIndex].microTag}
+                </div>
+                <div className="card-artwork-container">
+                  <PreviewArtwork type={filteredProjects[hoveredListIndex].artworkType} />
+                </div>
+                <div className="card-center-view-btn" aria-hidden="true">
+                  <span>View</span>
+                </div>
+                <div className="card-bottom-title">
+                  {filteredProjects[hoveredListIndex].title}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
+      )}
 
       {/* SECTION E: Project Details Modal Dialog */}
       <AnimatePresence>

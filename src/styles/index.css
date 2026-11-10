@@ -897,7 +897,7 @@ textarea {
    FLOATING INTERACTIVE PREVIEW CARD (Matches exact reference screenshot)
    -------------------------------------------------------------------------- */
 .floating-preview-card-portal {
-  pointer-events: none;
+  pointer-events: none !important;
   z-index: 900;
   will-change: transform;
 }
@@ -914,7 +914,8 @@ textarea {
   padding: 26px;
   box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.12);
   color: #FFFFFF;
-  pointer-events: none;
+  pointer-events: none !important;
+  user-select: none;
 }
 
 .card-top-tag {
@@ -943,7 +944,7 @@ textarea {
   object-fit: contain;
 }
 
-/* Circular "View" Button in Dead Center of the Floating Card */
+/* Circular "View" Indicator in Dead Center of the Floating Card */
 .card-center-view-btn {
   position: absolute;
   top: 50%;
@@ -960,15 +961,10 @@ textarea {
   align-items: center;
   justify-content: center;
   border: none;
-  cursor: pointer;
   box-shadow: 0 8px 28px rgba(98, 91, 238, 0.5), inset 0 1px 2px rgba(255, 255, 255, 0.3);
-  transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.22s ease;
   z-index: 4;
-}
-
-.card-center-view-btn:hover {
-  transform: translate(-50%, -50%) scale(1.12);
-  box-shadow: 0 12px 36px rgba(98, 91, 238, 0.65), inset 0 1px 2px rgba(255, 255, 255, 0.4);
+  pointer-events: none !important;
+  user-select: none;
 }
 
 .card-bottom-title {
